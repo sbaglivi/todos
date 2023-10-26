@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
 	"time"
+
+	"github.com/fatih/color"
 )
 
 type subtask struct {
@@ -54,6 +55,10 @@ When the first letter is capitalised, the identifier is public to any piece of c
 When the first letter is lowercase, the identifier is private and could only be accessed within the package it was declared.
 https://stackoverflow.com/questions/26327391/json-marshalstruct-returns
 */
+type jsonWrapper struct {
+	HighestId int
+	Areas     []jsonArea
+}
 type jsonArea struct {
 	Id        int
 	Title     string
@@ -62,20 +67,20 @@ type jsonArea struct {
 }
 
 type jsonTask struct {
-	id          int
-	title       string
-	done        bool
-	createdOn   time.Time
-	completedOn time.Time
-	subtasks    []jsonSubtask
+	Id          int
+	Title       string
+	Done        bool
+	CreatedOn   string
+	CompletedOn string
+	Subtasks    []jsonSubtask
 }
 
 type jsonSubtask struct {
-	id          int
-	title       string
-	done        bool
-	createdOn   time.Time
-	completedOn time.Time
+	Id          int
+	Title       string
+	Done        bool
+	CreatedOn   string
+	CompletedOn string
 }
 
 func (s *jsonStore) Init() {
@@ -84,22 +89,18 @@ func (s *jsonStore) Init() {
 		// file does not exist yet
 		s.areas = make([]jsonArea, 0)
 	} else {
+		var wrapper jsonWrapper
 		defer jsonFile.Close()
 		byteValue, _ := io.ReadAll(jsonFile)
-		json.Unmarshal([]byte(byteValue), &s.areas)
-		highestCount := 0
-		for _, a := range s.areas {
-			if a.Id > highestCount {
-				highestCount = a.Id
-			}
-		}
-		s.highestId = highestCount
+		json.Unmarshal([]byte(byteValue), &wrapper)
+		s.highestId = wrapper.HighestId
+		s.areas = wrapper.Areas
 	}
 }
 
 func (s *jsonStore) CreateArea(title string) jsonArea {
 	s.areas = append(s.areas, jsonArea{
-		Id:        s.highestId + 1,
+		Id:        s.highestId,
 		Title:     title,
 		Tasks:     make([]jsonTask, 0),
 		CreatedOn: time.Now().UTC().Format(time.RFC3339),
@@ -108,11 +109,50 @@ func (s *jsonStore) CreateArea(title string) jsonArea {
 	return s.areas[len(s.areas)-1]
 }
 
-func (s *jsonStore) Save() {
-	for _, a := range s.areas {
-		fmt.Printf("%+v\n", a)
+func subtasksFromTitles(highestId *int, titles []string) []jsonSubtask {
+	subtasks := make([]jsonSubtask, len(titles))
+	for i, t := range titles {
+		subtasks[i] = jsonSubtask{
+			Id:        *highestId,
+			Title:     t,
+			CreatedOn: time.Now().UTC().Format(time.RFC3339),
+		}
+		*highestId++
 	}
-	areasJson, err := json.MarshalIndent(s.areas, "", "  ")
+	return subtasks
+}
+
+func (s *jsonStore) CreateTask(id int, title string, subtasks ...string) {
+	for i := range s.areas {
+		if s.areas[i].Id == id {
+			taskId := s.highestId
+			s.highestId++
+			var jSubtasks []jsonSubtask
+			if len(subtasks) > 0 {
+				jSubtasks = subtasksFromTitles(&s.highestId, subtasks)
+			} else {
+				jSubtasks = make([]jsonSubtask, 0)
+			}
+			s.areas[i].Tasks = append(s.areas[i].Tasks, jsonTask{
+				Title:     title,
+				Id:        taskId,
+				Subtasks:  jSubtasks,
+				CreatedOn: time.Now().UTC().Format(time.RFC3339),
+			})
+		}
+	}
+
+}
+
+func (s *jsonStore) Save(print bool) {
+	if print {
+		printTodos(s.areas)
+	}
+	wrapper := jsonWrapper{
+		HighestId: s.highestId,
+		Areas:     s.areas,
+	}
+	areasJson, err := json.MarshalIndent(wrapper, "", "  ")
 	if err != nil {
 		panic(err)
 	}
@@ -122,10 +162,45 @@ func (s *jsonStore) Save() {
 	}
 }
 
+func (s *jsonStore) CreateSubtask(id int, title string) {
+	for i := range s.areas {
+		for j := range s.areas[i].Tasks {
+			if s.areas[i].Tasks[j].Id == id {
+				s.areas[i].Tasks[j].Subtasks = append(s.areas[i].Tasks[j].Subtasks, jsonSubtask{
+					Title:     title,
+					Id:        s.highestId,
+					CreatedOn: time.Now().UTC().Format(time.RFC3339),
+				})
+				s.highestId++
+			}
+		}
+	}
+}
+func (s *jsonStore) createSomeShit() {
+	s.CreateArea("new area")
+	s.CreateTask(0, "my first task!")
+	s.CreateSubtask(1, "this is a subtask!")
+}
+
+func printTodos(areas []jsonArea) {
+	for _, a := range areas {
+		// fmt.Printf("%d: %s\n", a.Id, a.Title)
+		color.Cyan("%d: %s\n", a.Id, a.Title)
+		for _, t := range a.Tasks {
+			color.Yellow("%2s%d: %s\n", "", t.Id, t.Title)
+			// fmt.Printf("%2s%d: %s\n", "", t.Id, t.Title)
+			for _, s := range t.Subtasks {
+				color.Red("%4s%d: %s\n", "", s.Id, s.Title)
+				// fmt.Printf("%4s%d: %s\n", "", s.Id, s.Title)
+			}
+		}
+	}
+}
+
 func main() {
 	store := jsonStore{fileName: "todos.json"}
 	store.Init()
-	store.CreateArea("new area")
-	store.CreateArea("another are")
-	store.Save()
+	store.CreateTask(0, "new tech", "is it working?", "please tell me so")
+	printTodos(store.areas)
+	store.Save(false)
 }

@@ -1,38 +1,67 @@
-[
-  {
-    "Id": 0,
-    "Title": "",
-    "CreatedOn": "",
-    "Tasks": null
-  },
-  {
-    "Id": 0,
-    "Title": "",
-    "CreatedOn": "",
-    "Tasks": null
-  },
-  {
-    "Id": 1,
-    "Title": "new area",
-    "CreatedOn": "2023-10-25T21:09:30Z",
-    "Tasks": []
-  },
-  {
-    "Id": 2,
-    "Title": "another are",
-    "CreatedOn": "2023-10-25T21:09:30Z",
-    "Tasks": []
-  },
-  {
-    "Id": 3,
-    "Title": "new area",
-    "CreatedOn": "2023-10-25T21:09:32Z",
-    "Tasks": []
-  },
-  {
-    "Id": 4,
-    "Title": "another are",
-    "CreatedOn": "2023-10-25T21:09:32Z",
-    "Tasks": []
-  }
-]
+{
+  "HighestId": 8,
+  "Areas": [
+    {
+      "Id": 0,
+      "Title": "new area",
+      "CreatedOn": "2023-10-26T20:17:06Z",
+      "Tasks": [
+        {
+          "Id": 1,
+          "Title": "my first task!",
+          "Done": false,
+          "CreatedOn": "2023-10-26T20:17:06Z",
+          "CompletedOn": "",
+          "Subtasks": [
+            {
+              "Id": 2,
+              "Title": "this is a subtask!",
+              "Done": false,
+              "CreatedOn": "2023-10-26T20:17:06Z",
+              "CompletedOn": ""
+            }
+          ]
+        },
+        {
+          "Id": 3,
+          "Title": "I have another thing to do",
+          "Done": false,
+          "CreatedOn": "2023-10-26T20:38:14Z",
+          "CompletedOn": "",
+          "Subtasks": [
+            {
+              "Id": 4,
+              "Title": "To get it done I need this",
+              "Done": false,
+              "CreatedOn": "2023-10-26T20:38:14Z",
+              "CompletedOn": ""
+            }
+          ]
+        },
+        {
+          "Id": 5,
+          "Title": "new tech",
+          "Done": false,
+          "CreatedOn": "2023-10-26T20:49:26Z",
+          "CompletedOn": "",
+          "Subtasks": [
+            {
+              "Id": 6,
+              "Title": "is it working?",
+              "Done": false,
+              "CreatedOn": "2023-10-26T20:49:26Z",
+              "CompletedOn": ""
+            },
+            {
+              "Id": 7,
+              "Title": "please tell me so",
+              "Done": false,
+              "CreatedOn": "2023-10-26T20:49:26Z",
+              "CompletedOn": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
