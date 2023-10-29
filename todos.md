@@ -1,0 +1,10 @@
+- Area:
+  - [ ] Task
+  - [ ] Another task
+    - [x] A subtask that is completed
+    - [ ] one that is not
+- Empty area
+- New area
+  - [x] correct task completed
+    - [x] with a subtask
+    - [ ] and another one
