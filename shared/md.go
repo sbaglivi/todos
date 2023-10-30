@@ -161,16 +161,17 @@ func (s *MarkdownStore) load() {
 
 func (s *MarkdownStore) areasAsMDString() string {
 	var builder strings.Builder
+	done := " "
 	for _, area := range s.areas {
 		builder.WriteString(fmt.Sprintf("- %s\n", area.Title))
 		for _, task := range area.Tasks {
-			done := " "
+			done = " "
 			if task.Done {
 				done = "x"
 			}
 			builder.WriteString(fmt.Sprintf("%*s- [%s] %s\n", 2, "", done, task.Title))
 			for _, subtask := range task.Subtasks {
-				done := " "
+				done = " "
 				if subtask.Done {
 					done = "x"
 				}
@@ -199,20 +200,32 @@ func (s *MarkdownStore) Save() {
 }
 
 func (s *MarkdownStore) ToggleTask(prefix string) {
-	matches := make([]*Task, 0)
+	taskMatches := make([]*Task, 0)
+	subtaskMatches := make([]*Subtask, 0)
 	for i := range s.areas {
-		area := s.areas[i]
+		area := &s.areas[i]
 		for j := range area.Tasks {
-			task := area.Tasks[j]
+			task := &area.Tasks[j]
 			if startsWithIgnoreCase(task.Title, prefix) {
-				matches = append(matches, &task)
+				taskMatches = append(taskMatches, task)
+			}
+			for k := range task.Subtasks {
+				subtask := &task.Subtasks[k]
+				if startsWithIgnoreCase(subtask.Title, prefix) {
+					subtaskMatches = append(subtaskMatches, subtask)
+				}
 			}
 		}
 	}
-	if len(matches) != 1 {
-		panic(errors.New(fmt.Sprintf("search for task with prefix %s found %d results", prefix, len(matches))))
+	if len(taskMatches)+len(subtaskMatches) != 1 {
+		fmt.Printf("search for task with prefix \"%s\" found %d results\n", prefix, len(taskMatches)+len(subtaskMatches))
+		os.Exit(1)
 	}
-	matches[0].Done = !matches[0].Done
+	if len(taskMatches) == 1 {
+		taskMatches[0].Done = !taskMatches[0].Done
+	} else {
+		subtaskMatches[0].Done = !subtaskMatches[0].Done
+	}
 }
 
 func oldoldmain() {
