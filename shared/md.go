@@ -7,7 +7,20 @@ import (
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/spf13/cobra"
 )
+
+func Ls(cmd *cobra.Command, args []string, store *MarkdownStore) {
+	switch len(args) {
+	case 1:
+		store.LsArea(args[0])
+	case 0:
+		store.Print()
+	default:
+		panic("ls expects 0 or 1 arguments but more were given")
+	}
+}
 
 // func setup(cmd *cobra.Command, args []string) {
 // 	fmt.Println("setup ran")
@@ -159,25 +172,31 @@ func (s *MarkdownStore) load() {
 	s.areas = areas
 }
 
-func (s *MarkdownStore) areasAsMDString() string {
+func (s *MarkdownStore) areaAsMDString(a Area) string {
 	var builder strings.Builder
 	done := " "
-	for _, area := range s.areas {
-		builder.WriteString(fmt.Sprintf("- %s\n", area.Title))
-		for _, task := range area.Tasks {
+	builder.WriteString(fmt.Sprintf("- %s\n", a.Title))
+	for _, task := range a.Tasks {
+		done = " "
+		if task.Done {
+			done = "x"
+		}
+		builder.WriteString(fmt.Sprintf("%*s- [%s] %s\n", 2, "", done, task.Title))
+		for _, subtask := range task.Subtasks {
 			done = " "
-			if task.Done {
+			if subtask.Done {
 				done = "x"
 			}
-			builder.WriteString(fmt.Sprintf("%*s- [%s] %s\n", 2, "", done, task.Title))
-			for _, subtask := range task.Subtasks {
-				done = " "
-				if subtask.Done {
-					done = "x"
-				}
-				builder.WriteString(fmt.Sprintf("%*s- [%s] %s\n", 4, "", done, subtask.Title))
-			}
+			builder.WriteString(fmt.Sprintf("%*s- [%s] %s\n", 4, "", done, subtask.Title))
 		}
+	}
+	return builder.String()
+}
+
+func (s *MarkdownStore) areasAsMDString() string {
+	var builder strings.Builder
+	for _, area := range s.areas {
+		builder.WriteString(s.areaAsMDString(area))
 	}
 	return builder.String()
 }
@@ -197,6 +216,20 @@ func (s *MarkdownStore) Save() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (s *MarkdownStore) LsArea(prefix string) {
+	possibleAreas := make([]*Area, 0)
+	for _, a := range s.areas {
+		if startsWithIgnoreCase(a.Title, prefix) {
+			possibleAreas = append(possibleAreas, &a)
+		}
+	}
+	if len(possibleAreas) != 1 {
+		fmt.Printf("search for areas with prefix \"%s\" found %d results\n", prefix, len(possibleAreas))
+		os.Exit(1)
+	}
+	fmt.Println(s.areaAsMDString(*possibleAreas[0]))
 }
 
 func (s *MarkdownStore) ToggleTask(prefix string) {
