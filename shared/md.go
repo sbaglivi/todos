@@ -65,7 +65,7 @@ func printAreas(areas []Area) {
 	fmt.Print(areasToString)
 }
 
-func startsWithIgnoreCase(s, prefix string) bool {
+func StartsWithIgnoreCase(s, prefix string) bool {
 	s = strings.ToLower(s)
 	prefix = strings.ToLower(prefix)
 	return strings.HasPrefix(s, prefix)
@@ -81,8 +81,8 @@ func areasToString(areas []Area) string {
 
 func (s *MarkdownStore) FindArea(prefix string) (error, Area) {
 	matches := make([]Area, 0)
-	for _, a := range s.areas {
-		if !startsWithIgnoreCase(a.Title, prefix) {
+	for _, a := range s.Areas {
+		if !StartsWithIgnoreCase(a.Title, prefix) {
 			continue
 		}
 		matches = append(matches, a)
@@ -98,7 +98,7 @@ func (s *MarkdownStore) FindArea(prefix string) (error, Area) {
 
 type MarkdownStore struct {
 	filename string
-	areas    []Area
+	Areas    []Area
 }
 
 func Setup() MarkdownStore {
@@ -169,7 +169,7 @@ func (s *MarkdownStore) load() {
 		areas = append(areas, currentArea)
 	}
 
-	s.areas = areas
+	s.Areas = areas
 }
 
 func (s *MarkdownStore) areaAsMDString(a Area) string {
@@ -195,7 +195,7 @@ func (s *MarkdownStore) areaAsMDString(a Area) string {
 
 func (s *MarkdownStore) areasAsMDString() string {
 	var builder strings.Builder
-	for _, area := range s.areas {
+	for _, area := range s.Areas {
 		builder.WriteString(s.areaAsMDString(area))
 	}
 	return builder.String()
@@ -220,8 +220,8 @@ func (s *MarkdownStore) Save() {
 
 func (s *MarkdownStore) LsArea(prefix string) {
 	possibleAreas := make([]*Area, 0)
-	for _, a := range s.areas {
-		if startsWithIgnoreCase(a.Title, prefix) {
+	for _, a := range s.Areas {
+		if StartsWithIgnoreCase(a.Title, prefix) {
 			possibleAreas = append(possibleAreas, &a)
 		}
 	}
@@ -235,16 +235,16 @@ func (s *MarkdownStore) LsArea(prefix string) {
 func (s *MarkdownStore) ToggleTask(prefix string) {
 	taskMatches := make([]*Task, 0)
 	subtaskMatches := make([]*Subtask, 0)
-	for i := range s.areas {
-		area := &s.areas[i]
+	for i := range s.Areas {
+		area := &s.Areas[i]
 		for j := range area.Tasks {
 			task := &area.Tasks[j]
-			if startsWithIgnoreCase(task.Title, prefix) {
+			if StartsWithIgnoreCase(task.Title, prefix) {
 				taskMatches = append(taskMatches, task)
 			}
 			for k := range task.Subtasks {
 				subtask := &task.Subtasks[k]
-				if startsWithIgnoreCase(subtask.Title, prefix) {
+				if StartsWithIgnoreCase(subtask.Title, prefix) {
 					subtaskMatches = append(subtaskMatches, subtask)
 				}
 			}

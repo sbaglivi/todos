@@ -4,6 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/sbaglivi/todos/shared"
@@ -24,6 +25,11 @@ to quickly create a Cobra application.`,
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
 		shared.Ls(cmd, args, &store)
+	},
+	RunE: func(cmd *cobra.Command, args []string) error {
+		// This function will handle the root command logic
+		fmt.Println("Root command executed")
+		return nil
 	},
 }
 

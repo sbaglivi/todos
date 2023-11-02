@@ -6,8 +6,23 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/sbaglivi/todos/shared"
 	"github.com/spf13/cobra"
 )
+
+func getAutocompleteList(cmd *cobra.Command, args []string, toComplete string, store *shared.MarkdownStore) ([]string, cobra.ShellCompDirective) {
+	// Retrieve the list of strings from your store and filter based on the substring toComplete.
+	options := make([]string, 0)
+	for _, a := range store.Areas {
+		for _, t := range a.Tasks {
+			// if toComplete == "" || (len(toComplete) <= len(item) && item[:len(toComplete)] == toComplete) {
+			if len(toComplete) < len(t.Title) && shared.StartsWithIgnoreCase(t.Title, toComplete) {
+				options = append(options, t.Title)
+			}
+		}
+	}
+	return options, cobra.ShellCompDirectiveNoFileComp
+}
 
 // toggleCmd represents the toggle command
 var toggleCmd = &cobra.Command{
@@ -26,8 +41,12 @@ to quickly create a Cobra application.`,
 		if len(args) == 1 {
 			store.ToggleTask(args[0])
 		}
+		store.Print()
 		store.Save()
 		fmt.Println("toggle called")
+	},
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return getAutocompleteList(cmd, args, toComplete, &store)
 	},
 }
 
