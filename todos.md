@@ -1,6 +1,6 @@
 - Area:
 - Empty area
 - New area
-  - [x] correct task completed
+  - [ ] correct task completed
     - [x] with a subtask
     - [x] and another one

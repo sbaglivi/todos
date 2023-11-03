@@ -5,6 +5,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/sbaglivi/todos/shared"
 	"github.com/spf13/cobra"
@@ -12,38 +14,38 @@ import (
 
 func getAutocompleteList(cmd *cobra.Command, args []string, toComplete string, store *shared.MarkdownStore) ([]string, cobra.ShellCompDirective) {
 	// Retrieve the list of strings from your store and filter based on the substring toComplete.
+	if len(args) != 0 {
+		return []string{}, cobra.ShellCompDirectiveNoFileComp
+	}
 	options := make([]string, 0)
 	for _, a := range store.Areas {
 		for _, t := range a.Tasks {
 			// if toComplete == "" || (len(toComplete) <= len(item) && item[:len(toComplete)] == toComplete) {
 			if len(toComplete) < len(t.Title) && shared.StartsWithIgnoreCase(t.Title, toComplete) {
-				options = append(options, t.Title)
+				// options = append(options, t.Title)
+				options = append(options, strings.ReplaceAll(t.Title, " ", "\\ "))
+				// options = append(options, strings.Split(t.Title, " ")[0])
 			}
 		}
 	}
+	// to debug args len
+	// options = append(options, fmt.Sprintf("%d", len(args)))
 	return options, cobra.ShellCompDirectiveNoFileComp
 }
 
 // toggleCmd represents the toggle command
 var toggleCmd = &cobra.Command{
 	Use:   "toggle",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Toggle completion of a task",
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
-			panic("no arguments given in call to toggle")
+			fmt.Println("toggle expects 1 or more arguments to identify the task to toggle, none were given")
+			os.Exit(1)
 		}
-		if len(args) == 1 {
-			store.ToggleTask(args[0])
-		}
+		store.ToggleTask(strings.Join(args, " "))
 		store.Print()
 		store.Save()
-		fmt.Println("toggle called")
 	},
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return getAutocompleteList(cmd, args, toComplete, &store)
@@ -52,14 +54,4 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(toggleCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// toggleCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// toggleCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

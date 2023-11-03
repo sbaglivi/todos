@@ -172,7 +172,7 @@ func (s *MarkdownStore) load() {
 	s.Areas = areas
 }
 
-func (s *MarkdownStore) areaAsMDString(a Area) string {
+func (s *MarkdownStore) AreaAsMDString(a Area) string {
 	var builder strings.Builder
 	done := " "
 	builder.WriteString(fmt.Sprintf("- %s\n", a.Title))
@@ -193,16 +193,16 @@ func (s *MarkdownStore) areaAsMDString(a Area) string {
 	return builder.String()
 }
 
-func (s *MarkdownStore) areasAsMDString() string {
+func (s *MarkdownStore) AreasAsMDString() string {
 	var builder strings.Builder
 	for _, area := range s.Areas {
-		builder.WriteString(s.areaAsMDString(area))
+		builder.WriteString(s.AreaAsMDString(area))
 	}
 	return builder.String()
 }
 
 func (s *MarkdownStore) Print() {
-	fmt.Println(s.areasAsMDString())
+	fmt.Println(s.AreasAsMDString())
 }
 
 func (s *MarkdownStore) Save() {
@@ -211,7 +211,7 @@ func (s *MarkdownStore) Save() {
 		panic(err)
 	}
 	defer newFile.Close()
-	toWrite := s.areasAsMDString()
+	toWrite := s.AreasAsMDString()
 	_, err = newFile.Write([]byte(toWrite))
 	if err != nil {
 		panic(err)
@@ -229,7 +229,7 @@ func (s *MarkdownStore) LsArea(prefix string) {
 		fmt.Printf("search for areas with prefix \"%s\" found %d results\n", prefix, len(possibleAreas))
 		os.Exit(1)
 	}
-	fmt.Println(s.areaAsMDString(*possibleAreas[0]))
+	fmt.Println(s.AreaAsMDString(*possibleAreas[0]))
 }
 
 func (s *MarkdownStore) ToggleTask(prefix string) {
