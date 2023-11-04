@@ -360,6 +360,29 @@ __todos_handle_word()
     __todos_handle_word
 }
 
+_todos_add()
+{
+    last_command="todos_add"
+
+    command_aliases=()
+
+    commands=()
+
+    flags=()
+    two_word_flags=()
+    local_nonpersistent_flags=()
+    flags_with_completion=()
+    flags_completion=()
+
+    flags+=("--area=")
+    two_word_flags+=("--area")
+    two_word_flags+=("-a")
+
+    must_have_one_flag=()
+    must_have_one_noun=()
+    noun_aliases=()
+}
+
 _todos_completion()
 {
     last_command="todos_completion"
@@ -378,6 +401,9 @@ _todos_completion()
     flags+=("-h")
     local_nonpersistent_flags+=("--help")
     local_nonpersistent_flags+=("-h")
+    flags+=("--area=")
+    two_word_flags+=("--area")
+    two_word_flags+=("-a")
 
     must_have_one_flag=()
     must_have_one_noun=()
@@ -398,6 +424,9 @@ _todos_help()
     flags_with_completion=()
     flags_completion=()
 
+    flags+=("--area=")
+    two_word_flags+=("--area")
+    two_word_flags+=("-a")
 
     must_have_one_flag=()
     must_have_one_noun=()
@@ -419,6 +448,9 @@ _todos_ls()
     flags_with_completion=()
     flags_completion=()
 
+    flags+=("--area=")
+    two_word_flags+=("--area")
+    two_word_flags+=("-a")
 
     must_have_one_flag=()
     must_have_one_noun=()
@@ -440,6 +472,9 @@ _todos_toggle()
     flags_with_completion=()
     flags_completion=()
 
+    flags+=("--area=")
+    two_word_flags+=("--area")
+    two_word_flags+=("-a")
 
     must_have_one_flag=()
     must_have_one_noun=()
@@ -454,6 +489,7 @@ _todos_root_command()
     command_aliases=()
 
     commands=()
+    commands+=("add")
     commands+=("completion")
     commands+=("help")
     commands+=("ls")
@@ -465,6 +501,9 @@ _todos_root_command()
     flags_with_completion=()
     flags_completion=()
 
+    flags+=("--area=")
+    two_word_flags+=("--area")
+    two_word_flags+=("-a")
 
     must_have_one_flag=()
     must_have_one_noun=()
