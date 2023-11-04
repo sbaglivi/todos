@@ -33,4 +33,7 @@ var store shared.MarkdownStore
 
 func init() {
 	store = shared.Setup()
+	var areaName string
+	rootCmd.PersistentFlags().StringVarP(&areaName, "area", "a", "", "Area name")
+	rootCmd.MarkFlagRequired("area") // Make the "area" flag mandatory
 }

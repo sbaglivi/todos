@@ -39,6 +39,11 @@ var toggleCmd = &cobra.Command{
 	Short: "Toggle completion of a task",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		area, err := cmd.Flags().GetString("area")
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(area)
 		if len(args) == 0 {
 			fmt.Println("toggle expects 1 or more arguments to identify the task to toggle, none were given")
 			os.Exit(1)
