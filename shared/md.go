@@ -44,7 +44,7 @@ type Subtask struct {
 }
 
 func parseTask(s string) (string, bool) {
-	re := regexp.MustCompile(`^ {2}- \[([x ])\] ([\w ]+)$`)
+	re := regexp.MustCompile(`^ {2}- \[([x ])\] ([\w -]+)$`)
 	match := re.FindStringSubmatch(s)
 	if match != nil {
 		return match[2], match[1] == "x"
@@ -63,6 +63,16 @@ func parseSubtask(s string) (string, bool) {
 
 func printAreas(areas []Area) {
 	fmt.Print(areasToString)
+}
+
+func LongestContainsOtherIgnoreCase(s1, s2 string) bool {
+	s1 = strings.ToLower(s1)
+	s2 = strings.ToLower(s2)
+	if len(s1) >= len(s2) {
+		return strings.HasPrefix(s1, s2)
+	} else {
+		return strings.HasPrefix(s2, s1)
+	}
 }
 
 func StartsWithIgnoreCase(s, prefix string) bool {

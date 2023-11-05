@@ -59,4 +59,5 @@ var toggleCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(toggleCmd)
+	toggleCmd.MarkPersistentFlagRequired("area") // Make the "area" flag mandatory
 }

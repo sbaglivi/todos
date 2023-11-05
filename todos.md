@@ -1,6 +1,15 @@
 - Area:
 - Empty area
 - New area
-  - [ ] correct task completed
+  - [x] correct task completed
     - [x] with a subtask
     - [x] and another one
+- TestArae
+  - [ ] clean
+  - [ ] clean kitchen
+- work
+  - [ ] eni-mev
+  - [ ] owb-ivr
+  - [ ] test
+    - [ ] task-one
+    - [ ] task-two
