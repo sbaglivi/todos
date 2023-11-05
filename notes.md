@@ -42,3 +42,8 @@ Functionalities required:
 `delete -t name`
 - delete area
 `delete -a name`
+
+Improvements:
+- printing to use colors
+- add expiration time to tasks / subtasks?
+- automatic removal of completed?
