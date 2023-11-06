@@ -7,9 +7,10 @@
 - TestArae
   - [ ] clean
   - [ ] clean kitchen
+    - [ ] clean sink
+    - [ ] clean under sink
+    - [ ] clean stove
 - work
   - [ ] eni-mev
   - [ ] owb-ivr
   - [ ] test
-    - [ ] task-one
-    - [ ] task-two

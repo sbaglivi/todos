@@ -22,6 +22,101 @@ func Ls(cmd *cobra.Command, args []string, store *MarkdownStore) {
 	}
 }
 
+func (s *MarkdownStore) DeleteSubtask(areaName, taskName, subtaskName string) error {
+	areaIndex := -1
+	taskIndex := -1
+	subtaskIndex := -1
+	for i := range s.Areas {
+		if areaIndex != -1 {
+			break
+		}
+		area := s.Areas[i]
+		if area.Title != areaName {
+			continue
+		}
+		areaIndex = i
+		for j := range area.Tasks {
+			if taskIndex != -1 {
+				break
+			}
+			task := area.Tasks[j]
+			if task.Title != taskName {
+				continue
+			}
+			taskIndex = j
+			for k := range task.Subtasks {
+				subtask := task.Subtasks[k]
+				if subtask.Title == subtaskName {
+					subtaskIndex = k
+					break
+				}
+			}
+		}
+	}
+	if areaIndex == -1 {
+		return errors.New(fmt.Sprintf("no area found with name: %s", areaName))
+	}
+	if taskIndex == -1 {
+		return errors.New(fmt.Sprintf("no task found with name: %s", taskName))
+	}
+	if subtaskIndex == -1 {
+		return errors.New(fmt.Sprintf("no subtask found with name: %s", subtaskName))
+	}
+	subtasksLength := len(s.Areas[areaIndex].Tasks[taskIndex].Subtasks)
+	interestedTask := &s.Areas[areaIndex].Tasks[taskIndex]
+	interestedTask.Subtasks[subtaskIndex] = interestedTask.Subtasks[subtasksLength-1]
+	interestedTask.Subtasks = interestedTask.Subtasks[:subtasksLength-1]
+	return nil
+}
+
+func (s *MarkdownStore) DeleteTask(areaName, taskName string) error {
+	areaIndex := -1
+	taskIndex := -1
+	for i := range s.Areas {
+		if areaIndex != -1 {
+			break
+		}
+		area := s.Areas[i]
+		if area.Title != areaName {
+			continue
+		}
+		areaIndex = i
+		for j := range area.Tasks {
+			task := area.Tasks[j]
+			if task.Title == taskName {
+				taskIndex = j
+				break
+			}
+		}
+	}
+	if areaIndex == -1 {
+		return errors.New(fmt.Sprintf("no area found with name: %s", areaName))
+	}
+	if taskIndex == -1 {
+		return errors.New(fmt.Sprintf("no task found with name: %s", taskName))
+	}
+	areaTaskLength := len(s.Areas[areaIndex].Tasks)
+	s.Areas[areaIndex].Tasks[taskIndex] = s.Areas[areaIndex].Tasks[areaTaskLength-1]
+	s.Areas[areaIndex].Tasks = s.Areas[areaIndex].Tasks[:areaTaskLength-1]
+	return nil
+}
+
+func (s *MarkdownStore) DeleteArea(name string) error {
+	index := -1
+	for i := range s.Areas {
+		area := s.Areas[i]
+		if area.Title == name {
+			index = i
+		}
+	}
+	if index == -1 {
+		return errors.New(fmt.Sprintf("no area found with name: %s", name))
+	}
+	s.Areas[index] = s.Areas[len(s.Areas)-1]
+	s.Areas = s.Areas[:len(s.Areas)-1]
+	return nil
+}
+
 // func setup(cmd *cobra.Command, args []string) {
 // 	fmt.Println("setup ran")
 // 	sharedOpts.Store = markdownStore{filename: "todos.md"}
